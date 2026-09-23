@@ -1,1 +1,490 @@
-index.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Biz-hub AI</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #07111f, #0b5cff);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      color: white;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 430px;
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(15px);
+      border-radius: 25px;
+      padding: 30px 22px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+    }
+
+    .logo {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    .logo-circle {
+      width: 70px;
+      height: 70px;
+      margin: auto;
+      border-radius: 50%;
+      background: #22c55e;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      font-weight: bold;
+      color: white;
+    }
+
+    h1 {
+      text-align: center;
+      margin-top: 12px;
+      font-size: 30px;
+    }
+
+    .subtitle {
+      text-align: center;
+      opacity: .8;
+      margin-top: 5px;
+      margin-bottom: 25px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .tabs button {
+      flex: 1;
+      padding: 13px;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: bold;
+      background: rgba(255,255,255,.15);
+      color: white;
+    }
+
+    .tabs button.active {
+      background: #22c55e;
+    }
+
+    input {
+      width: 100%;
+      padding: 15px;
+      margin-bottom: 13px;
+      border: none;
+      border-radius: 12px;
+      outline: none;
+      font-size: 16px;
+    }
+
+    .main-btn {
+      width: 100%;
+      padding: 15px;
+      border: none;
+      border-radius: 12px;
+      background: #22c55e;
+      color: white;
+      font-size: 17px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 5px;
+    }
+
+    .message {
+      text-align: center;
+      margin-top: 15px;
+      min-height: 22px;
+    }
+
+    #dashboard {
+      display: none;
+      text-align: center;
+    }
+
+    .welcome {
+      font-size: 25px;
+      margin-bottom: 15px;
+    }
+
+    .feature {
+      background: rgba(255,255,255,.12);
+      padding: 18px;
+      border-radius: 15px;
+      margin: 12px 0;
+      text-align: left;
+    }
+
+    .logout {
+      background: #ef4444;
+      margin-top: 15px;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+
+    <!-- LOGIN / SIGNUP -->
+    <div id="authSection">
+
+      <div class="logo">
+        <div class="logo-circle">B</div>
+        <h1>Biz-hub AI</h1>
+        <p class="subtitle">Build. Connect. Grow.</p>
+      </div>
+
+      <div class="tabs">
+        <button id="loginTab" class="active" onclick="showLogin()">
+          Login
+        </button>
+
+        <button id="signupTab" onclick="showSignup()">
+          Sign Up
+        </button>
+      </div>
+
+      <div id="signupNameBox" class="hidden">
+        <input
+          type="text"
+          id="name"
+          placeholder="Full Name"
+        >
+      </div>
+
+      <input
+        type="email"
+        id="email"
+        placeholder="Email Address"
+      >
+
+      <input
+        type="password"
+        id="password"
+        placeholder="Password"
+      >
+
+      <button class="main-btn" onclick="submitForm()" id="submitBtn">
+        Login
+      </button>
+
+      <div class="message" id="message"></div>
+
+    </div>
+
+
+    <!-- DASHBOARD -->
+    <div id="dashboard">
+
+      <div class="logo">
+        <div class="logo-circle">B</div>
+      </div>
+
+      <div class="welcome">
+        Welcome to Biz-hub AI
+      </div>
+
+      <p id="userEmail"></p>
+
+      <div class="feature">
+        <h3>🤖 AI Business Assistant</h3>
+        <p>Get help with your business ideas, marketing and growth.</p>
+      </div>
+
+      <div class="feature">
+        <h3>💼 Business Hub</h3>
+        <p>Connect and manage your business activities.</p>
+      </div>
+
+      <div class="feature">
+        <h3>🚀 Grow Your Business</h3>
+        <p>More powerful Biz-hub features will be added here.</p>
+      </div>
+
+      <button class="main-btn logout" onclick="logout()">
+        Logout
+      </button>
+
+    </div>
+
+  </div>
+
+
+<script>
+
+  /* =====================================
+     SUPABASE SETTINGS
+     ===================================== */
+
+  const SUPABASE_URL = "PASTE_YOUR_SUPABASE_URL_HERE";
+
+  const SUPABASE_ANON_KEY =
+    "PASTE_YOUR_SUPABASE_ANON_KEY_HERE";
+
+
+  const supabaseClient =
+    supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_ANON_KEY
+    );
+
+
+  /* =====================================
+     LOGIN / SIGNUP SWITCH
+     ===================================== */
+
+  let mode = "login";
+
+
+  function showLogin() {
+
+    mode = "login";
+
+    document
+      .getElementById("signupNameBox")
+      .classList.add("hidden");
+
+    document
+      .getElementById("submitBtn")
+      .innerText = "Login";
+
+    document
+      .getElementById("loginTab")
+      .classList.add("active");
+
+    document
+      .getElementById("signupTab")
+      .classList.remove("active");
+
+    clearMessage();
+  }
+
+
+  function showSignup() {
+
+    mode = "signup";
+
+    document
+      .getElementById("signupNameBox")
+      .classList.remove("hidden");
+
+    document
+      .getElementById("submitBtn")
+      .innerText = "Create Account";
+
+    document
+      .getElementById("signupTab")
+      .classList.add("active");
+
+    document
+      .getElementById("loginTab")
+      .classList.remove("active");
+
+    clearMessage();
+  }
+
+
+  /* =====================================
+     LOGIN / SIGNUP
+     ===================================== */
+
+  async function submitForm() {
+
+    const email =
+      document.getElementById("email").value.trim();
+
+    const password =
+      document.getElementById("password").value;
+
+    const message =
+      document.getElementById("message");
+
+    if (!email || !password) {
+
+      message.innerText =
+        "Please enter your email and password.";
+
+      return;
+    }
+
+
+    message.innerText = "Please wait...";
+
+
+    if (mode === "signup") {
+
+      const name =
+        document.getElementById("name").value.trim();
+
+      if (!name) {
+
+        message.innerText =
+          "Please enter your full name.";
+
+        return;
+      }
+
+
+      const { data, error } =
+        await supabaseClient.auth.signUp({
+
+          email: email,
+
+          password: password,
+
+          options: {
+            data: {
+              full_name: name
+            }
+          }
+
+        });
+
+
+      if (error) {
+
+        message.innerText =
+          error.message;
+
+        return;
+      }
+
+
+      message.innerText =
+        "Account created successfully! Check your email if confirmation is required.";
+
+    } else {
+
+      const { data, error } =
+        await supabaseClient.auth.signInWithPassword({
+
+          email: email,
+
+          password: password
+
+        });
+
+
+      if (error) {
+
+        message.innerText =
+          error.message;
+
+        return;
+      }
+
+
+      showDashboard(data.user);
+    }
+
+  }
+
+
+  /* =====================================
+     SHOW DASHBOARD
+     ===================================== */
+
+  function showDashboard(user) {
+
+    document
+      .getElementById("authSection")
+      .style.display = "none";
+
+    document
+      .getElementById("dashboard")
+      .style.display = "block";
+
+    document
+      .getElementById("userEmail")
+      .innerText =
+        user.email;
+
+  }
+
+
+  /* =====================================
+     LOGOUT
+     ===================================== */
+
+  async function logout() {
+
+    await supabaseClient.auth.signOut();
+
+    document
+      .getElementById("dashboard")
+      .style.display = "none";
+
+    document
+      .getElementById("authSection")
+      .style.display = "block";
+
+    document
+      .getElementById("email")
+      .value = "";
+
+    document
+      .getElementById("password")
+      .value = "";
+
+    showLogin();
+  }
+
+
+  /* =====================================
+     CHECK EXISTING LOGIN
+     ===================================== */
+
+  async function checkUser() {
+
+    const { data } =
+      await supabaseClient.auth.getUser();
+
+    if (data.user) {
+
+      showDashboard(data.user);
+
+    }
+
+  }
+
+
+  function clearMessage() {
+
+    document
+      .getElementById("message")
+      .innerText = "";
+
+  }
+
+
+  checkUser();
+
+</script>
+
+</body>
+</html>
