@@ -5,8 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Biz-hub AI</title>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
   <style>
     * {
       box-sizing: border-box;
@@ -111,6 +109,11 @@
       margin-top: 5px;
     }
 
+    .main-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
     .message {
       text-align: center;
       margin-top: 15px;
@@ -160,36 +163,49 @@
       </div>
 
       <div class="tabs">
-        <button id="loginTab" class="active" onclick="showLogin()">
+
+        <button id="loginTab"
+                class="active"
+                onclick="showLogin()">
           Login
         </button>
 
-        <button id="signupTab" onclick="showSignup()">
+        <button id="signupTab"
+                onclick="showSignup()">
           Sign Up
         </button>
+
       </div>
 
       <div id="signupNameBox" class="hidden">
+
         <input
           type="text"
           id="name"
           placeholder="Full Name"
+          autocomplete="name"
         >
+
       </div>
 
       <input
         type="email"
         id="email"
         placeholder="Email Address"
+        autocomplete="email"
       >
 
       <input
         type="password"
         id="password"
         placeholder="Password"
+        autocomplete="current-password"
       >
 
-      <button class="main-btn" onclick="submitForm()" id="submitBtn">
+      <button
+        class="main-btn"
+        onclick="submitForm()"
+        id="submitBtn">
         Login
       </button>
 
@@ -209,24 +225,35 @@
         Welcome to Biz-hub AI
       </div>
 
+      <p id="userName"></p>
       <p id="userEmail"></p>
 
       <div class="feature">
         <h3>🤖 AI Business Assistant</h3>
-        <p>Get help with your business ideas, marketing and growth.</p>
+        <p>
+          Get help with your business ideas,
+          marketing and growth.
+        </p>
       </div>
 
       <div class="feature">
         <h3>💼 Business Hub</h3>
-        <p>Connect and manage your business activities.</p>
+        <p>
+          Connect and manage your business activities.
+        </p>
       </div>
 
       <div class="feature">
         <h3>🚀 Grow Your Business</h3>
-        <p>More powerful Biz-hub features will be added here.</p>
+        <p>
+          More powerful Biz-hub features will be
+          added here.
+        </p>
       </div>
 
-      <button class="main-btn logout" onclick="logout()">
+      <button
+        class="main-btn logout"
+        onclick="logout()">
         Logout
       </button>
 
@@ -235,256 +262,457 @@
   </div>
 
 
-<script>
+  <!-- ==========================================
+       FIREBASE
+       ========================================== -->
 
-  /* =====================================
-     SUPABASE SETTINGS
-     ===================================== */
+  <script type="module">
 
-  const SUPABASE_URL = "PASTE_YOUR_SUPABASE_URL_HERE";
+    import {
+      initializeApp
+    } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
 
-  const SUPABASE_ANON_KEY =
-    "PASTE_YOUR_SUPABASE_ANON_KEY_HERE";
+    import {
+      getAuth,
+      createUserWithEmailAndPassword,
+      signInWithEmailAndPassword,
+      signOut,
+      onAuthStateChanged,
+      updateProfile
+    } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
 
 
-  const supabaseClient =
-    supabase.createClient(
-      SUPABASE_URL,
-      SUPABASE_ANON_KEY
+    /* ==========================================
+       YOUR FIREBASE CONFIGURATION
+       ========================================== */
+
+    const firebaseConfig = {
+
+      apiKey:
+        "AIzaSyAZHOldcPc_K_Pw4GQtLfaOy-6nrcIwDJI",
+
+      authDomain:
+        "buz-hub-ai.firebaseapp.com",
+
+      projectId:
+        "buz-hub-ai",
+
+      storageBucket:
+        "buz-hub-ai.firebasestorage.app",
+
+      messagingSenderId:
+        "103014637130",
+
+      appId:
+        "1:103014637130:web:99193c0ccbefb1fc9050b3",
+
+      measurementId:
+        "G-2HQE9MDT1V"
+    };
+
+
+    /* ==========================================
+       INITIALIZE FIREBASE
+       ========================================== */
+
+    const app = initializeApp(firebaseConfig);
+
+    const auth = getAuth(app);
+
+
+    /* ==========================================
+       LOGIN / SIGNUP MODE
+       ========================================== */
+
+    let mode = "login";
+
+
+    window.showLogin = function () {
+
+      mode = "login";
+
+      document
+        .getElementById("signupNameBox")
+        .classList.add("hidden");
+
+      document
+        .getElementById("submitBtn")
+        .innerText = "Login";
+
+      document
+        .getElementById("loginTab")
+        .classList.add("active");
+
+      document
+        .getElementById("signupTab")
+        .classList.remove("active");
+
+      document
+        .getElementById("password")
+        .setAttribute("autocomplete", "current-password");
+
+      clearMessage();
+    };
+
+
+    window.showSignup = function () {
+
+      mode = "signup";
+
+      document
+        .getElementById("signupNameBox")
+        .classList.remove("hidden");
+
+      document
+        .getElementById("submitBtn")
+        .innerText = "Create Account";
+
+      document
+        .getElementById("signupTab")
+        .classList.add("active");
+
+      document
+        .getElementById("loginTab")
+        .classList.remove("active");
+
+      document
+        .getElementById("password")
+        .setAttribute("autocomplete", "new-password");
+
+      clearMessage();
+    };
+
+
+    /* ==========================================
+       LOGIN / SIGNUP
+       ========================================== */
+
+    window.submitForm = async function () {
+
+      const email =
+        document
+          .getElementById("email")
+          .value
+          .trim();
+
+      const password =
+        document
+          .getElementById("password")
+          .value;
+
+      const message =
+        document.getElementById("message");
+
+      const submitBtn =
+        document.getElementById("submitBtn");
+
+
+      if (!email || !password) {
+
+        message.innerText =
+          "Please enter your email and password.";
+
+        return;
+      }
+
+
+      if (password.length < 6) {
+
+        message.innerText =
+          "Password must be at least 6 characters.";
+
+        return;
+      }
+
+
+      message.innerText =
+        "Please wait...";
+
+      submitBtn.disabled = true;
+
+
+      try {
+
+        /* ======================================
+           SIGN UP
+           ====================================== */
+
+        if (mode === "signup") {
+
+          const name =
+            document
+              .getElementById("name")
+              .value
+              .trim();
+
+
+          if (!name) {
+
+            message.innerText =
+              "Please enter your full name.";
+
+            submitBtn.disabled = false;
+
+            return;
+          }
+
+
+          const userCredential =
+            await createUserWithEmailAndPassword(
+              auth,
+              email,
+              password
+            );
+
+
+          const user =
+            userCredential.user;
+
+
+          /* Save the user's name */
+
+          await updateProfile(user, {
+
+            displayName: name
+
+          });
+
+
+          message.innerText =
+            "Account created successfully!";
+
+
+          document
+            .getElementById("email")
+            .value = "";
+
+          document
+            .getElementById("password")
+            .value = "";
+
+        }
+
+
+        /* ======================================
+           LOGIN
+           ====================================== */
+
+        else {
+
+          await signInWithEmailAndPassword(
+            auth,
+            email,
+            password
+          );
+
+          message.innerText =
+            "Login successful!";
+
+        }
+
+
+      } catch (error) {
+
+        console.error(error);
+
+        let errorMessage =
+          "Something went wrong. Please try again.";
+
+
+        if (
+          error.code ===
+          "auth/email-already-in-use"
+        ) {
+
+          errorMessage =
+            "This email is already registered. Please login.";
+
+        }
+
+        else if (
+          error.code ===
+          "auth/invalid-email"
+        ) {
+
+          errorMessage =
+            "Please enter a valid email address.";
+
+        }
+
+        else if (
+          error.code ===
+          "auth/weak-password"
+        ) {
+
+          errorMessage =
+            "Password is too weak. Use at least 6 characters.";
+
+        }
+
+        else if (
+          error.code ===
+          "auth/invalid-credential"
+        ) {
+
+          errorMessage =
+            "Incorrect email or password.";
+
+        }
+
+        else if (
+          error.code ===
+          "auth/user-not-found"
+        ) {
+
+          errorMessage =
+            "No account was found with this email.";
+
+        }
+
+        else if (
+          error.code ===
+          "auth/wrong-password"
+        ) {
+
+          errorMessage =
+            "Incorrect password.";
+
+        }
+
+
+        message.innerText =
+          errorMessage;
+
+      }
+
+
+      submitBtn.disabled = false;
+
+    };
+
+
+    /* ==========================================
+       SHOW DASHBOARD
+       ========================================== */
+
+    function showDashboard(user) {
+
+      document
+        .getElementById("authSection")
+        .style.display = "none";
+
+      document
+        .getElementById("dashboard")
+        .style.display = "block";
+
+
+      document
+        .getElementById("userEmail")
+        .innerText =
+          user.email || "";
+
+
+      document
+        .getElementById("userName")
+        .innerText =
+          user.displayName
+            ? "Hello, " + user.displayName
+            : "";
+
+    }
+
+
+    /* ==========================================
+       LOGOUT
+       ========================================== */
+
+    window.logout = async function () {
+
+      try {
+
+        await signOut(auth);
+
+        document
+          .getElementById("dashboard")
+          .style.display = "none";
+
+        document
+          .getElementById("authSection")
+          .style.display = "block";
+
+        document
+          .getElementById("email")
+          .value = "";
+
+        document
+          .getElementById("password")
+          .value = "";
+
+        document
+          .getElementById("name")
+          .value = "";
+
+        showLogin();
+
+      }
+
+      catch (error) {
+
+        console.error(error);
+
+        document
+          .getElementById("message")
+          .innerText =
+            "Unable to logout. Please try again.";
+
+      }
+
+    };
+
+
+    /* ==========================================
+       CHECK LOGIN STATE
+       ========================================== */
+
+    onAuthStateChanged(
+      auth,
+      (user) => {
+
+        if (user) {
+
+          showDashboard(user);
+
+        }
+
+        else {
+
+          document
+            .getElementById("dashboard")
+            .style.display = "none";
+
+          document
+            .getElementById("authSection")
+            .style.display = "block";
+
+        }
+
+      }
     );
 
 
-  /* =====================================
-     LOGIN / SIGNUP SWITCH
-     ===================================== */
-
-  let mode = "login";
-
-
-  function showLogin() {
-
-    mode = "login";
-
-    document
-      .getElementById("signupNameBox")
-      .classList.add("hidden");
-
-    document
-      .getElementById("submitBtn")
-      .innerText = "Login";
-
-    document
-      .getElementById("loginTab")
-      .classList.add("active");
-
-    document
-      .getElementById("signupTab")
-      .classList.remove("active");
-
-    clearMessage();
-  }
-
-
-  function showSignup() {
-
-    mode = "signup";
-
-    document
-      .getElementById("signupNameBox")
-      .classList.remove("hidden");
-
-    document
-      .getElementById("submitBtn")
-      .innerText = "Create Account";
-
-    document
-      .getElementById("signupTab")
-      .classList.add("active");
-
-    document
-      .getElementById("loginTab")
-      .classList.remove("active");
-
-    clearMessage();
-  }
-
-
-  /* =====================================
-     LOGIN / SIGNUP
-     ===================================== */
-
-  async function submitForm() {
-
-    const email =
-      document.getElementById("email").value.trim();
-
-    const password =
-      document.getElementById("password").value;
-
-    const message =
-      document.getElementById("message");
-
-    if (!email || !password) {
-
-      message.innerText =
-        "Please enter your email and password.";
-
-      return;
-    }
-
-
-    message.innerText = "Please wait...";
-
-
-    if (mode === "signup") {
-
-      const name =
-        document.getElementById("name").value.trim();
-
-      if (!name) {
-
-        message.innerText =
-          "Please enter your full name.";
-
-        return;
-      }
-
-
-      const { data, error } =
-        await supabaseClient.auth.signUp({
-
-          email: email,
-
-          password: password,
-
-          options: {
-            data: {
-              full_name: name
-            }
-          }
-
-        });
-
-
-      if (error) {
-
-        message.innerText =
-          error.message;
-
-        return;
-      }
-
-
-      message.innerText =
-        "Account created successfully! Check your email if confirmation is required.";
-
-    } else {
-
-      const { data, error } =
-        await supabaseClient.auth.signInWithPassword({
-
-          email: email,
-
-          password: password
-
-        });
-
-
-      if (error) {
-
-        message.innerText =
-          error.message;
-
-        return;
-      }
-
-
-      showDashboard(data.user);
-    }
-
-  }
-
-
-  /* =====================================
-     SHOW DASHBOARD
-     ===================================== */
-
-  function showDashboard(user) {
-
-    document
-      .getElementById("authSection")
-      .style.display = "none";
-
-    document
-      .getElementById("dashboard")
-      .style.display = "block";
-
-    document
-      .getElementById("userEmail")
-      .innerText =
-        user.email;
-
-  }
-
-
-  /* =====================================
-     LOGOUT
-     ===================================== */
-
-  async function logout() {
-
-    await supabaseClient.auth.signOut();
-
-    document
-      .getElementById("dashboard")
-      .style.display = "none";
-
-    document
-      .getElementById("authSection")
-      .style.display = "block";
-
-    document
-      .getElementById("email")
-      .value = "";
-
-    document
-      .getElementById("password")
-      .value = "";
-
-    showLogin();
-  }
-
-
-  /* =====================================
-     CHECK EXISTING LOGIN
-     ===================================== */
-
-  async function checkUser() {
-
-    const { data } =
-      await supabaseClient.auth.getUser();
-
-    if (data.user) {
-
-      showDashboard(data.user);
+    /* ==========================================
+       CLEAR MESSAGE
+       ========================================== */
+
+    function clearMessage() {
+
+      document
+        .getElementById("message")
+        .innerText = "";
 
     }
 
-  }
-
-
-  function clearMessage() {
-
-    document
-      .getElementById("message")
-      .innerText = "";
-
-  }
-
-
-  checkUser();
-
-</script>
+  </script>
 
 </body>
-</html>
+      </html>      
