@@ -1,11 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
+   <!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Biz-hub AI</title>
-
-  <style>
+  <title>Biz-hub AI</title>  <style>
     * {
       box-sizing: border-box;
       margin: 0;
@@ -138,6 +135,15 @@
       text-align: left;
     }
 
+    .feature h3 {
+      margin-bottom: 8px;
+    }
+
+    .feature p {
+      line-height: 1.5;
+      opacity: .9;
+    }
+
     .logout {
       background: #ef4444;
       margin-top: 15px;
@@ -146,115 +152,178 @@
     .hidden {
       display: none;
     }
-  </style>
-</head>
 
-<body>
+    /* ==============================
+       AI CHAT
+       ============================== */
 
-  <div class="container">
+    .ai-box {
+      background: rgba(0,0,0,.18);
+      padding: 15px;
+      border-radius: 18px;
+      margin-top: 18px;
+      text-align: left;
+    }
 
-    <!-- LOGIN / SIGNUP -->
-    <div id="authSection">
+    .ai-title {
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 12px;
+      text-align: center;
+    }
 
-      <div class="logo">
-        <div class="logo-circle">B</div>
-        <h1>Biz-hub AI</h1>
-        <p class="subtitle">Build. Connect. Grow.</p>
+    #chatMessages {
+      height: 260px;
+      overflow-y: auto;
+      padding: 8px;
+      background: rgba(255,255,255,.06);
+      border-radius: 12px;
+      margin-bottom: 12px;
+    }
+
+    .chat-message {
+      padding: 10px 12px;
+      border-radius: 12px;
+      margin-bottom: 9px;
+      line-height: 1.45;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+
+    .user-message {
+      background: #22c55e;
+      margin-left: 25px;
+    }
+
+    .ai-message {
+      background: rgba(255,255,255,.15);
+      margin-right: 25px;
+    }
+
+    .chat-input-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    #chatInput {
+      margin: 0;
+      flex: 1;
+      min-width: 0;
+    }
+
+    #sendChatBtn {
+      width: 90px;
+      margin: 0;
+      padding: 12px;
+    }
+
+    .typing {
+      opacity: .7;
+      font-style: italic;
+    }
+  </style></head><body>  <div class="container"><!-- LOGIN / SIGNUP -->
+<div id="authSection">
+
+  <div class="logo">
+    <div class="logo-circle">B</div>
+    <h1>Biz-hub AI</h1>
+    <p class="subtitle">Build. Connect. Grow.</p>
+  </div>
+
+  <div class="tabs">
+
+    <button
+      id="loginTab"
+      class="active"
+      onclick="showLogin()">
+      Login
+    </button>
+
+    <button
+      id="signupTab"
+      onclick="showSignup()">
+      Sign Up
+    </button>
+
+  </div>
+
+  <div id="signupNameBox" class="hidden">
+
+    <input
+      type="text"
+      id="name"
+      placeholder="Full Name"
+      autocomplete="name">
+
+  </div>
+
+  <input
+    type="email"
+    id="email"
+    placeholder="Email Address"
+    autocomplete="email">
+
+  <input
+    type="password"
+    id="password"
+    placeholder="Password"
+    autocomplete="current-password">
+
+  <button
+    class="main-btn"
+    onclick="submitForm()"
+    id="submitBtn">
+    Login
+  </button>
+
+  <div class="message" id="message"></div>
+
+</div>
+
+
+<!-- DASHBOARD -->
+<div id="dashboard">
+
+  <div class="logo">
+    <div class="logo-circle">B</div>
+  </div>
+
+  <div class="welcome">
+    Welcome to Biz-hub AI
+  </div>
+
+  <p id="userName"></p>
+  <p id="userEmail"></p>
+
+
+  <!-- AI ASSISTANT -->
+  <div class="ai-box">
+
+    <div class="ai-title">
+      🤖 Biz-hub AI Assistant
+    </div>
+
+    <div id="chatMessages">
+
+      <div class="chat-message ai-message">
+        Hello! 👋 I'm your Biz-hub AI Assistant. Ask me about business ideas, marketing, branding, customers, sales, or business growth.
       </div>
-
-      <div class="tabs">
-
-        <button id="loginTab"
-                class="active"
-                onclick="showLogin()">
-          Login
-        </button>
-
-        <button id="signupTab"
-                onclick="showSignup()">
-          Sign Up
-        </button>
-
-      </div>
-
-      <div id="signupNameBox" class="hidden">
-
-        <input
-          type="text"
-          id="name"
-          placeholder="Full Name"
-          autocomplete="name"
-        >
-
-      </div>
-
-      <input
-        type="email"
-        id="email"
-        placeholder="Email Address"
-        autocomplete="email"
-      >
-
-      <input
-        type="password"
-        id="password"
-        placeholder="Password"
-        autocomplete="current-password"
-      >
-
-      <button
-        class="main-btn"
-        onclick="submitForm()"
-        id="submitBtn">
-        Login
-      </button>
-
-      <div class="message" id="message"></div>
 
     </div>
 
+    <div class="chat-input-row">
 
-    <!-- DASHBOARD -->
-    <div id="dashboard">
-
-      <div class="logo">
-        <div class="logo-circle">B</div>
-      </div>
-
-      <div class="welcome">
-        Welcome to Biz-hub AI
-      </div>
-
-      <p id="userName"></p>
-      <p id="userEmail"></p>
-
-      <div class="feature">
-        <h3>🤖 AI Business Assistant</h3>
-        <p>
-          Get help with your business ideas,
-          marketing and growth.
-        </p>
-      </div>
-
-      <div class="feature">
-        <h3>💼 Business Hub</h3>
-        <p>
-          Connect and manage your business activities.
-        </p>
-      </div>
-
-      <div class="feature">
-        <h3>🚀 Grow Your Business</h3>
-        <p>
-          More powerful Biz-hub features will be
-          added here.
-        </p>
-      </div>
+      <input
+        type="text"
+        id="chatInput"
+        placeholder="Ask Biz-hub AI..."
+        autocomplete="off">
 
       <button
-        class="main-btn logout"
-        onclick="logout()">
-        Logout
+        class="main-btn"
+        id="sendChatBtn"
+        onclick="sendMessage()">
+        Send
       </button>
 
     </div>
@@ -262,11 +331,31 @@
   </div>
 
 
-  <!-- ==========================================
-       FIREBASE
-       ========================================== -->
+  <div class="feature">
+    <h3>💼 Business Hub</h3>
+    <p>
+      Connect and manage your business activities.
+    </p>
+  </div>
 
-  <script type="module">
+  <div class="feature">
+    <h3>🚀 Grow Your Business</h3>
+    <p>
+      More powerful Biz-hub features will be added here.
+    </p>
+  </div>
+
+  <button
+    class="main-btn logout"
+    onclick="logout()">
+    Logout
+  </button>
+
+</div>
+
+  </div>  <!-- ==========================================
+       FIREBASE
+       ========================================== -->  <script type="module">
 
     import {
       initializeApp
@@ -283,7 +372,7 @@
 
 
     /* ==========================================
-       YOUR FIREBASE CONFIGURATION
+       FIREBASE CONFIGURATION
        ========================================== */
 
     const firebaseConfig = {
@@ -321,6 +410,14 @@
 
 
     /* ==========================================
+       SUPABASE AI FUNCTION
+       ========================================== */
+
+    const AI_FUNCTION_URL =
+      "https://vwdpviqevshamhzzlxvz.supabase.co/functions/v1/openai-chat";
+
+
+    /* ==========================================
        LOGIN / SIGNUP MODE
        ========================================== */
 
@@ -349,7 +446,10 @@
 
       document
         .getElementById("password")
-        .setAttribute("autocomplete", "current-password");
+        .setAttribute(
+          "autocomplete",
+          "current-password"
+        );
 
       clearMessage();
     };
@@ -377,7 +477,10 @@
 
       document
         .getElementById("password")
-        .setAttribute("autocomplete", "new-password");
+        .setAttribute(
+          "autocomplete",
+          "new-password"
+        );
 
       clearMessage();
     };
@@ -469,12 +572,8 @@
             userCredential.user;
 
 
-          /* Save the user's name */
-
           await updateProfile(user, {
-
             displayName: name
-
           });
 
 
@@ -623,6 +722,226 @@
 
 
     /* ==========================================
+       AI CHAT
+       ========================================== */
+
+    window.sendMessage = async function () {
+
+      const input =
+        document.getElementById("chatInput");
+
+      const sendButton =
+        document.getElementById("sendChatBtn");
+
+      const chatMessages =
+        document.getElementById("chatMessages");
+
+      const message =
+        input.value.trim();
+
+
+      if (!message) {
+        return;
+      }
+
+
+      /* Show user's message */
+
+      const userMessage =
+        document.createElement("div");
+
+      userMessage.className =
+        "chat-message user-message";
+
+      userMessage.innerText =
+        message;
+
+      chatMessages.appendChild(
+        userMessage
+      );
+
+
+      input.value = "";
+
+      chatMessages.scrollTop =
+        chatMessages.scrollHeight;
+
+
+      /* Disable button while AI responds */
+
+      sendButton.disabled = true;
+
+      sendButton.innerText = "...";
+
+
+      /* Typing message */
+
+      const typing =
+        document.createElement("div");
+
+      typing.className =
+        "chat-message ai-message typing";
+
+      typing.innerText =
+        "Biz-hub AI is thinking...";
+
+      chatMessages.appendChild(typing);
+
+      chatMessages.scrollTop =
+        chatMessages.scrollHeight;
+
+
+      try {
+
+        const response =
+          await fetch(
+            AI_FUNCTION_URL,
+            {
+              method: "POST",
+
+              headers: {
+                "Content-Type":
+                  "application/json"
+              },
+
+              body: JSON.stringify({
+
+                message: message,
+
+                messages: [
+                  {
+                    role: "user",
+                    content: message
+                  }
+                ]
+
+              })
+            }
+          );
+
+
+        const data =
+          await response.json();
+
+
+        typing.remove();
+
+
+        if (!response.ok) {
+
+          throw new Error(
+            data.error ||
+            data.message ||
+            "AI request failed."
+          );
+
+        }
+
+
+        /* Try common response formats */
+
+        const aiReply =
+          data.reply ||
+          data.message ||
+          data.content ||
+          data.output ||
+          (
+            data.choices &&
+            data.choices[0] &&
+            data.choices[0].message &&
+            data.choices[0].message.content
+          );
+
+
+        if (!aiReply) {
+
+          throw new Error(
+            "The AI returned an unexpected response."
+          );
+
+        }
+
+
+        const aiMessage =
+          document.createElement("div");
+
+        aiMessage.className =
+          "chat-message ai-message";
+
+        aiMessage.innerText =
+          aiReply;
+
+        chatMessages.appendChild(
+          aiMessage
+        );
+
+
+      } catch (error) {
+
+        console.error(
+          "AI Error:",
+          error
+        );
+
+
+        typing.remove();
+
+
+        const errorMessage =
+          document.createElement("div");
+
+        errorMessage.className =
+          "chat-message ai-message";
+
+        errorMessage.innerText =
+          "Sorry, I couldn't connect to Biz-hub AI right now. Please try again.";
+
+
+        chatMessages.appendChild(
+          errorMessage
+        );
+
+      }
+
+
+      sendButton.disabled = false;
+
+      sendButton.innerText =
+        "Send";
+
+
+      chatMessages.scrollTop =
+        chatMessages.scrollHeight;
+
+    };
+
+
+    /* ==========================================
+       SEND CHAT WITH ENTER KEY
+       ========================================== */
+
+    document
+      .getElementById("chatInput")
+      .addEventListener(
+        "keydown",
+        function(event) {
+
+          if (
+            event.key === "Enter" &&
+            !event.shiftKey
+          ) {
+
+            event.preventDefault();
+
+            sendMessage();
+
+          }
+
+        }
+      );
+
+
+    /* ==========================================
        LOGOUT
        ========================================== */
 
@@ -712,7 +1031,5 @@
 
     }
 
-  </script>
-
-</body>
-      </html>      
+  </script></body>
+</html> 
